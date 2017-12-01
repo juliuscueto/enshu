@@ -1,0 +1,27 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      h_limit_max: -71
+      h_limit_min: -91
+      i_limit_max: 192
+      i_limit_min: 144
+      id: 0
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      s_limit_max: 255
+      s_limit_min: 0
+      state: true
+      type: ''
+    state: []
+  h_limit_max: -71
+  h_limit_min: -91
+  i_limit_max: 192
+  i_limit_min: 144
+  s_limit_max: 255
+  s_limit_min: 0
+state: []
