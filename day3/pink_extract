@@ -4,24 +4,24 @@ dictitems:
     dictitems:
       groups: !!python/object/new:dynamic_reconfigure.encoding.Config
         state: []
-      h_limit_max: -71
-      h_limit_min: -91
-      i_limit_max: 213
-      i_limit_min: 145
+      h_limit_max: 24
+      h_limit_min: -17
+      i_limit_max: 157
+      i_limit_min: 39
       id: 0
       name: Default
       parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
         state: []
       parent: 0
-      s_limit_max: 255
-      s_limit_min: 34
+      s_limit_max: 76
+      s_limit_min: 43
       state: true
       type: ''
     state: []
-  h_limit_max: -71
-  h_limit_min: -91
-  i_limit_max: 213
-  i_limit_min: 145
-  s_limit_max: 255
-  s_limit_min: 34
+  h_limit_max: 24
+  h_limit_min: -17
+  i_limit_max: 157
+  i_limit_min: 39
+  s_limit_max: 76
+  s_limit_min: 43
 state: []
