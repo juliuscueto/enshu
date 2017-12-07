@@ -1,6 +1,6 @@
 (load "package://dxl_armed_turtlebot/euslisp/dxl-armed-turtlebot-interface.l")
 (load "package://roseus/test/joy.l")
-(init-ps3joy)
+(init-ps3joy) 
 
 (dxl-armed-turtlebot-init)
 (objects (list *dxl-armed-turtlebot*))
