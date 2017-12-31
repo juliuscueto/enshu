@@ -10,17 +10,20 @@
 (defvar *topic-name* "/camera/depth_registered/boxes")
 (defvar *bounding-box-list* nil)
 
+;; global variables to control button of ps3
 (setq *circle-button* 0)
 (setq *cross-button* 0)
 (setq *square-button* 0)
+
+;; unit-vectors, used to get positions from BoundingBox
+(setq e_x (float-vector 1 0 0))
+(setq e_y (float-vector 0 1 0))
+(setq e_z (float-vector 0 0 1))
+
 ;; taret to move-arm, in mm
 (setq *x-target* 400)
 (setq *y-target* 0)
 (setq *z-target* 200)
-
-(setq e_x (float-vector 1 0 0))
-(setq e_y (float-vector 0 1 0))
-(setq e_z (float-vector 0 0 1))
 
 ;; *n-pos* is in meter
 (setq *x-pos* 0)
@@ -28,9 +31,13 @@
 (setq *z-pos* 0)
 (setq *fetch_state* 0)
 
+;; start node "trad_grad" (defined by this program)
 (ros::roseus "track_grab")
 
+;; initiate robot object
 (dxl-armed-turtlebot-init)
+
+;; define function used to move arm
 (defun move-arm ()
     (send *dxl-armed-turtlebot* :inverse-kinematics
       (make-coords :pos (float-vector *x-target* *y-target* *z-target*))
@@ -39,13 +46,15 @@
       (send *ri* :angle-vector (send *dxl-armed-turtlebot* :angle-vector) 1000)
 )
 
+;; draw simulated robot
 (objects (list *dxl-armed-turtlebot*))
 
-;; set arm pos to see
+;; set arm pos to enable seeing
 (send *dxl-armed-turtlebot* :tuckarm-pose3)
 (send *ri* :angle-vector (send *dxl-armed-turtlebot* :angle-vector))
 (send *ri* :wait-interpolation)
 
+;; define callback function
 (defun bounding-box-array-cb (msg)
   (setq *bounding-box-list* (send msg :boxes))
   ;; boxesは、BoundingBoxのArray(Euslispではlist)
@@ -68,20 +77,17 @@
                   (cond
                     ((= *fetch_state* 0)
                       (progn
-                        ; (cam->obj-coords (ros::tf-pose->coords (send b :pose)))
-                        ; (setq *pos* (send (send bx :worldcoords) :pos))
+                        ;; obtain coords to move robot to close position
                         (setq *x-pos* (/ (- (v. e_z *pos*) 87) 1000))
                         (setq *y-pos* (/ (+ (v. e_x *pos*) 12.5) -1000))
                         (setq *z-pos* (+ (/ (v. e_y *pos*) -1000) -0.11))
-                        ; (setq *x* (send (send b :dimensions) :x))
-                        ; (setq *y* (send (send b :dimensions) :y))
-                        ; (setq *z* (send (send b :dimensions) :z))
                         (warn "positions x ~A y ~A z ~A~%" *x-pos* *y-pos* *z-pos*)
                         (setq *fetch_state* 1)
                       )
                     )
                     ((= *fetch_state* 2)
                       (progn
+                        ;; obtain coords of target
                         (warn "near object, recalculate ~A ~%" *pos*)
                         (setq *x-target* (- (v. e_z *pos*) 87))
                         (setq *y-target* (* (v. e_x *pos*) -1))
@@ -98,12 +104,15 @@
   )
 )
 
+;; subscribe to output of hsi_color_filter
 (ros::subscribe *topic-name*
   jsk_recognition_msgs::BoundingBoxArray
   #'bounding-box-array-cb 1)
 
+;; main loop
 (do-until-key
   (x::window-main-one)
+  ;; obtain button information
   (setq *circle-button* (send *joy* :circle-button))
   (setq *cross-button* (send *joy* :cross-button))
   (setq *square-button* (send *joy* :square-button))
@@ -130,8 +139,8 @@
             (send *ri* :stop-grasp)
             (send *dxl-armed-turtlebot* :gripper :arm :angle-vector #f(89))
             (send *ri* :angle-vector (send *dxl-armed-turtlebot* :angle-vector) 1000 :gripper-controller)
-            ; (send *ri* :go-pos 0.15 0 0)
-            ; (setq *x-target* (- *x-target* 150))
+
+            ;; adjusting *z-target* so ik will not fail. adjustment will differ from environment to environment
             (setq *z-target* (+ *z-target* 30))
             (move-arm)
             (send *ri* :wait-interpolation)
